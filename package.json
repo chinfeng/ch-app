@@ -1,0 +1,18 @@
+{
+  "name": "clubhouse-app",
+  "version": "0.9.1",
+  "main": "index.js",
+  "repository": "https://github.com/chinfeng/clubhouse-app.git",
+  "author": "Chinfeng Chung",
+  "license": "GPL",
+  "private": true,
+  "devDependencies": {
+    "concurrently": "^6.0.0",
+    "wait-on": "^5.2.1"
+  },
+  "scripts": {
+    "postinstall": "yarn --cwd app && yarn --cwd gui",
+    "start": "concurrently \"yarn --cwd gui start\" \"wait-on http://localhost:3000 && yarn --cwd app start\"",
+    "package": "yarn --cwd gui build && yarn --cwd app package"
+  }
+}

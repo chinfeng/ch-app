@@ -1,0 +1,16 @@
+
+.user-avatar {
+    border-radius: 38.2%;
+}
+
+.ch-avatar {
+  position: relative;
+}
+
+.ch-avatar :global(.show-on-hover) {
+  visibility: hidden;
+}
+
+.ch-avatar:hover :global(.show-on-hover) {
+  visibility: visible;
+}

@@ -1,0 +1,15 @@
+{
+  "short_name": "Clubhouse App",
+  "name": "Clubhouse App",
+  "icons": [
+    {
+      "src": "icon_wave.2872aeea710c.png",
+      "type": "image/png",
+      "sizes": "120x120"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}

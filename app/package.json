@@ -1,0 +1,60 @@
+{
+  "name": "clubhouse-app-ele",
+  "version": "0.9.1",
+  "description": "Clubhouse-app",
+  "main": "index.js",
+  "author": "Chinfeng Chung",
+  "license": "GPL",
+  "private": true,
+  "scripts": {
+    "start": "electron-forge start -- --debug",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.54",
+    "@electron-forge/maker-deb": "^6.0.0-beta.54",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.54",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
+    "@electron-forge/maker-zip": "^6.0.0-beta.54",
+    "electron": "10.2.0"
+  },
+  "dependencies": {
+    "agora-electron-sdk": "^3.2.1-rc.71-build.1123",
+    "electron-fetch": "^1.7.3",
+    "electron-is-dev": "^2.0.0",
+    "electron-squirrel-startup": "^1.0.0"
+  },
+  "config": {
+    "forge": {
+      "packagerConfig": {
+        "name": "clubhouse-app",
+        "extraResource": [
+          "../gui/build/"
+        ]
+      },
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "clubhouse_app"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  }
+}
