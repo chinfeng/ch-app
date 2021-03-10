@@ -19,7 +19,7 @@ import { userInfoContext } from './context';
 
 import ClubhousePage from './clubhousePage';
 import LoginPage from './loginPage';
-import { checkWaitlistStatus, getFollowingIds } from './chapi';
+import { checkWaitlistStatus, getFollowingIds, updateAuthHeaders } from './chapi';
 import { LoadingOutlined } from '@ant-design/icons';
 
 const locales = {
@@ -28,16 +28,17 @@ const locales = {
 
 function App() {
   const [userInfo, setUserInfo] = useState(JSON.parse(localStorage.getItem('userInfo') || 'null'));
-  const [isWait, setWait] = useState(true);
+  const [toLogin, setToLogin] = useState(true);
   const [init, setInit] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
         if (userInfo && !userInfo.followingIds) {
+          updateAuthHeaders(userInfo);
           userInfo.followingIds = await getFollowingIds();
           const respChk = await checkWaitlistStatus();
-          setWait(respChk.status === 200 && respChk.body.success);
+          setToLogin(!(respChk.status === 200 && respChk.body.success && !respChk.body.is_waiting && respChk.body.is_onboarding));
           setUserInfo({...userInfo});
         }
       } catch (e) {
@@ -59,7 +60,7 @@ function App() {
               <Switch>
                 <Route path="/clubhouse" component={ClubhousePage}/>
                 <Route path="/login" component={LoginPage}/>
-                <Redirect exact from="/" to={isWait ? '/login' : '/clubhouse'} />
+                <Redirect exact from="/" to={toLogin ? '/login' : '/clubhouse'} />
               </Switch>
             </Router>
           </ConfigProvider>
