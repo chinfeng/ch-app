@@ -35,7 +35,7 @@ import path from 'path';
 const eventEmitter = new EventEmitter();
 
 const rtcEngine = new AgoraRtcEngine();
-rtcEngine.initialize('938de3e8055e42b281bb8c6f69c21f78');
+rtcEngine.initialize('938de3e8055e42b281bb8c6f69c21f78', new Uint32Array([0xFFFFFFFF & 0xFFFFFFFE])[0]);
 
 rtcEngine.on('error', errorCode => eventEmitter.emit('error', errorCode, rtcEngine.getErrorDescription(errorCode)));
 rtcEngine.on('userJoined', (uid, elapsed) => eventEmitter.emit('userJoined', uid, elapsed));
