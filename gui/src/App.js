@@ -60,15 +60,23 @@ function App() {
     }
 
     async function fetchNotification () {
-      const notiResp = await getNotifications();
-      console.log('=== getNotifications ===', notiResp);
-      // TODO: display nofitication
+      try {
+        const notiResp = await getNotifications();
+        console.log('=== getNotifications ===', notiResp);
+        // TODO: display nofitication
+      } catch (e) {
+        console.error('=== getNotifications ===', e);
+      }
     }
 
     async function fetchActionableNotification () {
-      const notiActResp = await getActionableNotifications();
-      console.log('=== getActionableNotifications ===', notiActResp);
-      // TODO: Take actions. It hand raising in action notification?
+      try {
+        const notiActResp = await getActionableNotifications();
+        console.log('=== getActionableNotifications ===', notiActResp);
+        // TODO: Take actions. It hand raising in action notification?
+      } catch (e) {
+        console.error('=== getActionableNotifications ===', e);
+      }
     }
   }, [init]);
 
