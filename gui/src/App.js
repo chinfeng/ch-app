@@ -19,7 +19,7 @@ import { userInfoContext } from './context';
 
 import ClubhousePage from './clubhousePage';
 import LoginPage from './loginPage';
-import { checkWaitlistStatus, getFollowingIds, updateAuthHeaders } from './chapi';
+import { checkWaitlistStatus, getActionableNotifications, getFollowingIds, getNotifications, updateAuthHeaders } from './chapi';
 import { LoadingOutlined } from '@ant-design/icons';
 
 const locales = {
@@ -48,6 +48,29 @@ function App() {
       }
     })();
   }, [userInfo]);
+
+  useEffect(() => {
+    if (!init) {
+      const tn = setInterval(fetchNotification, 30000);
+      const ta = setInterval(fetchActionableNotification, 10000)
+      return () => {
+        clearInterval(tn);
+        clearInterval(ta);
+      }
+    }
+
+    async function fetchNotification () {
+      const notiResp = await getNotifications();
+      console.log('=== getNotifications ===', notiResp);
+      // TODO: display nofitication
+    }
+
+    async function fetchActionableNotification () {
+      const notiActResp = await getActionableNotifications();
+      console.log('=== getActionableNotifications ===', notiActResp);
+      // TODO: Take actions. It hand raising in action notification?
+    }
+  }, [init]);
 
   if (init) {
     return <Result icon={<LoadingOutlined/>} title="Loading" style={{height: '100%', paddingTop: '10%'}}/>;

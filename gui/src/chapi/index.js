@@ -267,3 +267,13 @@ export async function checkWaitlistStatus() {
   const resp = await fetch(`${API_URL}/check_waitlist_status`, { method: 'POST', headers: getAuthenticationHeaders()});
   return JSON.parse(resp);
 }
+
+export async function getNotifications() {
+  const resp = await fetch(`${API_URL}/get_notifications`, { headers: getAuthenticationHeaders()});
+  return JSON.parse(resp);
+}
+
+export async function getActionableNotifications() {
+  const resp = await fetch(`${API_URL}/get_actionable_notifications`, { headers: getAuthenticationHeaders()});
+  return JSON.parse(resp);
+}
