@@ -51,7 +51,7 @@ function App() {
 
   useEffect(() => {
     if (!init) {
-      const tn = setInterval(fetchNotification, 30000);
+      const tn = setInterval(fetchNotification, 60000);
       const ta = setInterval(fetchActionableNotification, 10000)
       return () => {
         clearInterval(tn);

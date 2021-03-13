@@ -1,5 +1,5 @@
 import { AudioMutedOutlined, LoadingOutlined, SettingOutlined, StarFilled, StarOutlined, UserOutlined, VerticalAlignBottomOutlined, VerticalAlignTopOutlined } from "@ant-design/icons";
-import { Avatar, Button, Typography, Card, Col, Divider, Drawer, notification, PageHeader, Result, Row, Space, Collapse, Badge, List } from "antd";
+import { Avatar, Button, Typography, Card, Col, Divider, Drawer, notification, PageHeader, Result, Row, Space, Collapse, Badge, List, Checkbox } from "antd";
 import ReactDOM from 'react-dom';
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useHistory, useLocation, useParams } from "react-router-dom";
@@ -47,9 +47,14 @@ const TopicPage = () => {
   const [countTimeline, setCountTimeline] = useState([]);
   const [speakersTimeline, setSpeakersTimeline] = useState([]);
   const [statsOptions, setStatesOptions] = useState();
+  const [statsEnabled, setStatsEnabled] = useState(false);
 
   useEffect(() => {
     const tid = setInterval(() => {
+      if (!statsEnabled) {
+        return;
+      }
+
       if (countTimeline.length > 0) {
         setStatesOptions({
           xAxis: {
@@ -94,7 +99,7 @@ const TopicPage = () => {
       }
     }, 1000);
     return () => clearInterval(tid)
-  }, [countTimeline, speakersTimeline]);
+  }, [countTimeline, speakersTimeline, statsEnabled]);
 
   useEffect(() => {
     console.log('location change', location);
@@ -254,6 +259,10 @@ const TopicPage = () => {
       console.log(`join rtc channel: ${token} ${channel} ${userInfo.userId}`);
 
       const refreshTask = setInterval(async () => {
+        if (!statsEnabled) {
+          return;
+        }
+
         try {
           const resp = await getChannel(channel);
           console.log('=== getChannel ===', {channel}, resp);
@@ -283,7 +292,7 @@ const TopicPage = () => {
             description: e.toString()
           });
         }
-      }, 3000)
+      }, 5000)
 
       const remoteAudioStateChanged = (uid, state, reason, elapsed) => {
         switch(reason) {
@@ -356,7 +365,7 @@ const TopicPage = () => {
         leaveRtcChannel();
       }
     }
-  }, [token, channel, userInfo.userId, setUsers, spUsers, auUsers, t])
+  }, [token, channel, userInfo.userId, setUsers, spUsers, auUsers, statsEnabled, t])
 
   const onAcceptSpeakerInvite = useCallback(() => {
     setMeSpeaking(true);
@@ -477,7 +486,18 @@ const TopicPage = () => {
 
         <Collapse ghost>
           <Panel header="Stats" key="1">
-            { !!statsOptions && <ReactECharts option={statsOptions} lazyUpdate={true}/> }
+            <Checkbox
+              checked={statsEnabled}
+              onChange={e => {
+                setStatsEnabled(e.target.checked);
+                if (!e.target.checked) {
+                  setCountTimeline([]);
+                  setSpeakersTimeline([]);
+                }
+              }}>
+              Enable Stats (May cause performance problem)
+            </Checkbox>
+            { (statsEnabled && !!statsOptions) && <ReactECharts option={statsOptions} lazyUpdate={true}/> }
           </Panel>
         </Collapse>
 
