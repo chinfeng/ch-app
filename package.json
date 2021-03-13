@@ -2,7 +2,7 @@
   "name": "clubhouse-app",
   "version": "0.9.1",
   "main": "index.js",
-  "repository": "https://github.com/chinfeng/clubhouse-app.git",
+  "repository": "https://github.com/chinfeng/ch-app.git",
   "author": "Chinfeng Chung",
   "license": "GPL",
   "private": true,

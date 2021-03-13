@@ -1,10 +1,13 @@
-import { AudioMutedOutlined, LoadingOutlined, SettingOutlined, StarFilled, StarOutlined, VerticalAlignBottomOutlined, VerticalAlignTopOutlined } from "@ant-design/icons";
-import { Avatar, Button, Typography, Card, Col, Divider, Drawer, notification, PageHeader, Result, Row, Space, Collapse, Badge } from "antd";
+import { AudioMutedOutlined, LoadingOutlined, SettingOutlined, StarFilled, StarOutlined, UserOutlined, VerticalAlignBottomOutlined, VerticalAlignTopOutlined } from "@ant-design/icons";
+import { Avatar, Button, Typography, Card, Col, Divider, Drawer, notification, PageHeader, Result, Row, Space, Collapse, Badge, List } from "antd";
+import ReactDOM from 'react-dom';
 import { useCallback, useContext, useEffect, useState } from "react";
 import { useHistory, useLocation, useParams } from "react-router-dom";
 import _ from 'lodash';
 
 import { useTranslation } from "react-i18next";
+import 'echarts';
+import ReactECharts from 'echarts-for-react';
 
 import { activePing, getChannel, getProfile, joinChannel, follow, unfollow, leaveChannel, makeModerator, uninviteSpeaker, inviteSpeaker} from "../chapi";
 import { userInfoContext } from "../context";
@@ -39,6 +42,60 @@ const TopicPage = () => {
   const [selectedUser, setSelectedUser] = useState({});
 
   const [isHandraiseEnabled ,setHandraiseEnabled] = useState();
+
+  // charts
+  const [countTimeline, setCountTimeline] = useState([]);
+  const [speakersTimeline, setSpeakersTimeline] = useState([]);
+  const [statsOptions, setStatesOptions] = useState();
+
+  useEffect(() => {
+    const tid = setInterval(() => {
+      if (countTimeline.length > 0) {
+        setStatesOptions({
+          xAxis: {
+            name: 'Time',
+            type: 'time',
+            axisLabel: {
+              formatter: '{HH}:{mm}'
+            },
+            axisPointer: {
+              snap: false,
+              label: {
+                show: false,
+              },
+              handle: {
+                show: true
+              },
+            },
+            splitLine: {
+              show: false
+            }
+          },
+          yAxis: {
+            name: 'Users',
+            min: Math.max(0, Math.min(...countTimeline.map(d => d[1])) - 5),
+            max: Math.max(...countTimeline.map(d => d[1])) + 5,
+          },
+          series: [{
+            type: 'line',
+            symbol: 'none',
+            smooth: true,
+            data: [...countTimeline, [new Date().getTime(), countTimeline.slice(-1)[0][1]]],
+          }],
+          tooltip: {
+            triggerOn: 'none',
+            alwaysShowContent: true,
+            formatter(params) {
+              const [time, count] = params[0].data;
+              const speakersTerm = speakersTimeline.filter(s => s[0] <= time).slice(-1)[0] || speakersTimeline[0];
+              return createStatsTooltip(time, count, speakersTerm);
+            },
+          },
+        });
+      }
+    }, 1000);
+    return () => clearInterval(tid)
+  }, [countTimeline, speakersTimeline]);
 
   useEffect(() => {
     console.log('location change', location);
@@ -128,6 +185,9 @@ const TopicPage = () => {
           setToken(resp.body.token);
           setHandraiseEnabled(resp.body.is_handraise_enabled);
 
+          setCountTimeline([[new Date().getTime() - 1000, resp.body.users.length]]);
+          setSpeakersTimeline([]);
+
           // const pubnub = subscribePubNub(userInfo.userId, channel, resp.body.pubnub_token, resp.body.pubnub_heartbeat_interval);
           // return () => pubnub.unsubscribeAll()
 
@@ -215,11 +275,33 @@ const TopicPage = () => {
         }
       }, 3000);
 
-      const onUserChanged = () => {
-        refreshChannel();
+      const countFn = (tl, addCount) => {
+        const last = tl.slice(-1)[0];
+        if (last) {
+          return [...tl, [new Date().getTime(), last[1] + addCount]];
+        } else {
+          return tl;
+        }
+      };
+
+      const userExists = uid => {
+        return [...spUsers, ...auUsers].some(u => u.user_id === uid);
       }
-      onRtcEvent('userJoined', onUserChanged);
-      onRtcEvent('useroffline', onUserChanged);
+
+      const onUserJoined = uid => {
+        if (!userExists(uid)) {
+          setCountTimeline(tl => countFn(tl, 1));
+          refreshChannel();
+        }
+      }
+      const onUserOffline = uid => {
+        if (userExists(uid)) {
+          setCountTimeline(tl => countFn(tl, -1));
+          refreshChannel();
+        }
+      }
+      onRtcEvent('userJoined', onUserJoined);
+      onRtcEvent('userOffline', onUserOffline);
 
       const remoteAudioStateChanged = (uid, state, reason, elapsed) => {
         switch(reason) {
@@ -251,8 +333,31 @@ const TopicPage = () => {
       }
       onRtcEvent('remoteAudioStateChanged', remoteAudioStateChanged);
 
-      const onAudioVolumeIndication = (speakers, speakerNumber, totalVolume) => {
+      const onAudioVolumeIndication =async (speakers, speakerNumber, totalVolume) => {
         // etc: [{"uid":355697565,"volume":4},{"uid":1258067152,"volume":25}]
+        const time = new Date().getTime();
+        const term = speakers.filter(s => s.uid !== 0).map(s => spUsers.find(sp => sp.user_id === s.uid) || {user_id : s.uid});
+        for (const u of term) {
+          if (!u.username) {
+            try {
+              const resp = await getProfile(u.user_id);
+              if (resp.body.success) {
+                Object.assign(u, {...resp.body.user_profile})
+              }
+            } catch (e) {
+              console.error('=== getProfile ===', e);
+            }
+          }
+        }
+
+        setSpeakersTimeline(tl => {
+          const [, lastTerm] = tl.slice(-1)[0] || [];
+          if (term.length > 0 && !term.every(c => lastTerm && lastTerm.some(l => c.user_id === l.user_id))) {
+            return [...tl, [time, term]];
+          } else {
+            return tl;
+          }
+        });
         setSpeakers(speakers);
         setMuted(allMuted => {
           return _.difference(allMuted, speakers.map(s => s.uid));
@@ -264,14 +369,14 @@ const TopicPage = () => {
 
       return () => {
         refreshChannel.cancel();
-        offRtcEvent('userJoined', onUserChanged);
-        offRtcEvent('userOffline', onUserChanged);
+        offRtcEvent('userJoined', onUserJoined);
+        offRtcEvent('userOffline', onUserOffline);
         offRtcEvent('groupAudioVolumeIndication', onAudioVolumeIndication);
         offRtcEvent('userMuteAudio', remoteAudioStateChanged);
         leaveRtcChannel();
       }
     }
-  }, [token, channel, userInfo.userId, setUsers, t])
+  }, [token, channel, userInfo.userId, setUsers, spUsers, auUsers, t])
 
   const onAcceptSpeakerInvite = useCallback(() => {
     setMeSpeaking(true);
@@ -389,6 +494,13 @@ const TopicPage = () => {
               isHandraiseEnabled={isHandraiseEnabled}/>
           </Col>
         </Row>
+
+        <Collapse ghost>
+          <Panel header="Stats" key="1">
+            { !!statsOptions && <ReactECharts option={statsOptions} lazyUpdate={true}/> }
+          </Panel>
+        </Collapse>
+
         <Divider orientation="left">Speakers</Divider>
         <div style={{display: 'flex', flexWrap: 'wrap', alignItem: 'flex-start'}}>
           {spUsers.map(user => (
@@ -524,5 +636,32 @@ const TopicPage = () => {
 function isSpeaking(uid, speakers) {
   return _.some(speakers, s => s.uid === uid);
 }
+
+
+function createStatsTooltip (time, count, speakersTerm) {
+  const term = (speakersTerm && speakersTerm[1]) || [];
+  const fragment = document.createDocumentFragment();
+  const tooltip = (
+    <div style={{textAlign: 'right'}}>
+      <h3>{new Date(time).toLocaleString()}</h3>
+      <p>Count: {count}</p>
+      <Divider/>
+      <List>
+        {
+          term.map(sp => (
+            <List.Item.Meta key={sp.user_id}
+              avatar={sp.photo_url ? <Avatar src={sp.photo_url} /> : <Avatar icon={<UserOutlined />} />}
+              title={sp.name}
+              description={'@' + sp.username}
+            />
+          ))
+        }
+      </List>
+    </div>
+  );
+  ReactDOM.render(tooltip, fragment)
+  return fragment;
+}
+
 
 export default TopicPage;
