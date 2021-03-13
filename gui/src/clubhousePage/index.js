@@ -13,6 +13,7 @@ import './selected.css';
 import { BulbTwoTone, PoweroffOutlined, ReloadOutlined, SaveOutlined } from '@ant-design/icons';
 import { userInfoContext } from '../context';
 import CreateChannel from './createChannel';
+import WaitPage from './waitPage';
 
 const { Sider, Content } = Layout;
 const { Paragraph, Text } = Typography;
@@ -149,13 +150,7 @@ const ClubHousePage = () => {
       <Content style={{padding: '8px 8px 8px 8px', overflowY: 'scroll'}}>
         <Switch>
           <Route path={`${url}/:channel`} component={TopicPage}/>
-          <Route exact path={`${url}`}>
-            <Row style={{height: '100%'}} align="middle">
-              <Col flex={1}>
-                <Empty description={t('waitSel')} />
-              </Col>
-            </Row>
-          </Route>
+          <Route exact path={`${url}`} component={WaitPage}/>
         </Switch>
       </Content>
     </Layout>

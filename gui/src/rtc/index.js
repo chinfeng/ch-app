@@ -94,3 +94,11 @@ export function muteLocal(muted) {
 export function setVoicePitch(pitch) {
   rtcEngine.setLocalVoicePitch(pitch);
 }
+
+export function startEchoTest() {
+  return rtcEngine.startEchoTestWithInterval(2);
+}
+
+export function stopEchoTest() {
+  return rtcEngine.stopEchoTest();
+}
