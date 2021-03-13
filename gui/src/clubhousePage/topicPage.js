@@ -84,7 +84,6 @@ const TopicPage = () => {
           }],
           tooltip: {
             triggerOn: 'none',
-            alwaysShowContent: true,
             formatter(params) {
               const [time, count] = params[0].data;
               const speakersTerm = speakersTimeline.filter(s => s[0] <= time).slice(-1)[0] || speakersTimeline[0];
@@ -254,13 +253,24 @@ const TopicPage = () => {
     if (token) {
       console.log(`join rtc channel: ${token} ${channel} ${userInfo.userId}`);
 
-      const refreshChannel = _.debounce(async () => {
+      const refreshTask = setInterval(async () => {
         try {
           const resp = await getChannel(channel);
           console.log('=== getChannel ===', {channel}, resp);
           if (resp.body.success) {
+            const time = new Date().getTime();
             setUsers(resp.body.users);
             setHandraiseEnabled(resp.body.is_handraise_enabled);
+            setCountTimeline(ctl => {
+              const last = ctl.slice(-1)[0] || [];
+              const [, lastCount] = last;
+
+              if (!(lastCount === resp.body.users.length)) {
+                return [...ctl, [time, resp.body.users.length]]
+              } else {
+                return ctl;
+              }
+            });
           } else {
             notification.open({
               message: t('apiError') + ' /get_channel',
@@ -273,35 +283,7 @@ const TopicPage = () => {
             description: e.toString()
           });
         }
-      }, 3000);
-
-      const countFn = (tl, addCount) => {
-        const last = tl.slice(-1)[0];
-        if (last) {
-          return [...tl, [new Date().getTime(), last[1] + addCount]];
-        } else {
-          return tl;
-        }
-      };
-
-      const userExists = uid => {
-        return [...spUsers, ...auUsers].some(u => u.user_id === uid);
-      }
-
-      const onUserJoined = uid => {
-        if (!userExists(uid)) {
-          setCountTimeline(tl => countFn(tl, 1));
-          refreshChannel();
-        }
-      }
-      const onUserOffline = uid => {
-        if (userExists(uid)) {
-          setCountTimeline(tl => countFn(tl, -1));
-          refreshChannel();
-        }
-      }
-      onRtcEvent('userJoined', onUserJoined);
-      onRtcEvent('userOffline', onUserOffline);
+      }, 3000)
 
       const remoteAudioStateChanged = (uid, state, reason, elapsed) => {
         switch(reason) {
@@ -368,9 +350,7 @@ const TopicPage = () => {
       joinRtcChannel(token, channel, '', userInfo.userId);
 
       return () => {
-        refreshChannel.cancel();
-        offRtcEvent('userJoined', onUserJoined);
-        offRtcEvent('userOffline', onUserOffline);
+        clearInterval(refreshTask);
         offRtcEvent('groupAudioVolumeIndication', onAudioVolumeIndication);
         offRtcEvent('userMuteAudio', remoteAudioStateChanged);
         leaveRtcChannel();
