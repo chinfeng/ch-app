@@ -356,16 +356,20 @@ const TopicPage = () => {
       }
       onRtcEvent('groupAudioVolumeIndication', onAudioVolumeIndication);
 
-      joinRtcChannel(token, channel, '', userInfo.userId);
-
       return () => {
         clearInterval(refreshTask);
         offRtcEvent('groupAudioVolumeIndication', onAudioVolumeIndication);
         offRtcEvent('userMuteAudio', remoteAudioStateChanged);
-        leaveRtcChannel();
       }
     }
   }, [token, channel, userInfo.userId, setUsers, spUsers, auUsers, statsEnabled, t])
+
+  useEffect(() => {
+    if (token) {
+      joinRtcChannel(token, channel, '', userInfo.userId);
+      return leaveRtcChannel;
+    }
+  }, [token, channel, userInfo.userId])
 
   const onAcceptSpeakerInvite = useCallback(() => {
     setMeSpeaking(true);
