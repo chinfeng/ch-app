@@ -259,10 +259,6 @@ const TopicPage = () => {
       console.log(`join rtc channel: ${token} ${channel} ${userInfo.userId}`);
 
       const refreshTask = setInterval(async () => {
-        if (!statsEnabled) {
-          return;
-        }
-
         try {
           const resp = await getChannel(channel);
           console.log('=== getChannel ===', {channel}, resp);
@@ -270,16 +266,18 @@ const TopicPage = () => {
             const time = new Date().getTime();
             setUsers(resp.body.users);
             setHandraiseEnabled(resp.body.is_handraise_enabled);
-            setCountTimeline(ctl => {
-              const last = ctl.slice(-1)[0] || [];
-              const [, lastCount] = last;
+            if (statsEnabled) {
+              setCountTimeline(ctl => {
+                const last = ctl.slice(-1)[0] || [];
+                const [, lastCount] = last;
 
-              if (!(lastCount === resp.body.users.length)) {
-                return [...ctl, [time, resp.body.users.length]]
-              } else {
-                return ctl;
-              }
-            });
+                if (!(lastCount === resp.body.users.length)) {
+                  return [...ctl, [time, resp.body.users.length]]
+                } else {
+                  return ctl;
+                }
+              });
+            }
           } else {
             notification.open({
               message: t('apiError') + ' /get_channel',
