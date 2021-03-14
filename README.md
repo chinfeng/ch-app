@@ -21,3 +21,23 @@ yarn package
 ```
 
 输出在 app/out 目录中
+
+Reuirements:
+```sh
+- Nodejs 32bit
+- Git and must be added to path
+- npm install --global concurrently
+- Go to the project folder and run the command yarn install
+```
+
+Starting the debug/development version
+```sh
+yarn start
+```
+
+Building the production version
+```sh
+yarn package
+```
+
+You will find the production version in app/out directory.
