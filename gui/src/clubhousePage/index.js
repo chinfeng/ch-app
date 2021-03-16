@@ -1,4 +1,4 @@
-import { Button, Card, Col, Empty, Input, Layout, notification, Popover, Row, Space, Tooltip, Typography } from 'antd';
+import { Button, Col, Input, Layout, notification, Popover, Row, Space, Tooltip, Typography, Avatar } from 'antd';
 import { useCallback, useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, Route, Switch, useHistory, useRouteMatch } from 'react-router-dom';
@@ -9,13 +9,16 @@ import path from 'path';
 import { getChannels } from '../chapi';
 import TopicPage from './topicPage';
 
-import './selected.css';
-import { BulbTwoTone, PoweroffOutlined, ReloadOutlined, SaveOutlined } from '@ant-design/icons';
+import './clubhouse.css';
+import { PlusOutlined, PoweroffOutlined, ReloadOutlined, SaveOutlined } from '@ant-design/icons';
 import { userInfoContext } from '../context';
 import CreateChannel from './createChannel';
+import UserProfile from './userProfile';
 import WaitPage from './waitPage';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCommentDots, faUser, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
-const { Sider, Content } = Layout;
+const { Sider, Content, Header } = Layout;
 const { Paragraph, Text } = Typography;
 const { Search } = Input;
 
@@ -109,50 +112,72 @@ const ClubHousePage = () => {
 
   return (
     <Layout style={{height: '100%'}}>
-      <Sider style={{padding: '8px 8px 8px 8px', overflowY: 'scroll', overflowX: 'hidden', position: 'relative'}} width={'38.2%'}>
-        <Space direction="vertical" style={{width: '100%', paddingTop: 85}}>
-          {filterChannels(channels, searchText).map(ch => (
-            <NavLink key={ch.channel_id} to={{pathname: `${url}/${ch.channel}`}} activeClassName="selected">
-              <Card title={ch.channel_id} type="inner" >
-                <Paragraph><Text strong>{t('topic')}</Text>: {highlight(ch.topic, searchText)}</Paragraph>
-                <Paragraph><Text strong>{t('numberParticipants')}</Text>: {ch.num_speakers}/{ch.num_all}</Paragraph>
-                <Paragraph>
-                  <ul>
-                    {ch.users.map(user => (
-                      <li key={user.user_id}>{highlight(user.name, searchText)}</li>
-                    ))}
-                  </ul>
-                </Paragraph>
-              </Card>
-            </NavLink>
-          ))}
-        </Space>
-        <div style={{'position': 'fixed', width:'calc(38.2% - 18px)', top: 0, left: 0, padding: 8, backgroundColor: '#001529'}}>
-          <Card >
+      <Header style={{backgroundColor: '#e7e4d5'}}>
+        <Row align="middle">
+          <Col span={20} className="ch-toolbar">
             <Space>
+              <Popover title={t('createRoom')} content={<CreateChannel/>}>
+                <Button title={t('createRoom')} type="primary" shape="circle" size="small" icon={<PlusOutlined />}/>
+              </Popover>
               <Tooltip title={t('refresh')}>
-                <Button type="primary" shape="circle" size="small" loading={updating} icon={<ReloadOutlined />} onClick={updateChannel}/>
+                <Button shape="circle" size="small" loading={updating} icon={<ReloadOutlined />} onClick={updateChannel}/>
               </Tooltip>
               <Tooltip title={t('exportAuthorized')}>
                 <Button shape="circle" size="small" icon={<SaveOutlined />} onClick={exportAuth}/>
               </Tooltip>
-              <Popover title={t('createRoom')} content={<CreateChannel/>}>
-                <Button title={t('createRoom')} shape="circle" size="small" icon={<BulbTwoTone />}/>
-              </Popover>
               <Tooltip title={t('logout')}>
                 <Button danger shape="circle" size="small" icon={<PoweroffOutlined />} onClick={logout}/>
               </Tooltip>
-              <Search size="small" placeholder="Search" allowClear onSearch={onSearch} enterButton={false}/>
+              <Search
+                style={{transform: 'translateY(50%)'}}
+                placeholder="Search" allowClear onSearch={onSearch} enterButton={false}/>
             </Space>
-          </Card>
-        </div>
-      </Sider>
-      <Content style={{padding: '8px 8px 8px 8px', overflowY: 'scroll'}}>
-        <Switch>
-          <Route path={`${url}/:channel`} component={TopicPage}/>
-          <Route exact path={`${url}`} component={WaitPage}/>
-        </Switch>
-      </Content>
+          </Col>
+          <Col span={4} style={{textAlign: 'right'}}>
+            <UserProfile />
+          </Col>
+        </Row>
+      </Header>
+      <Layout style={{height: 'calc(100% - 64px)'}}>
+        <Sider style={{overflowY: 'scroll', overflowX: 'hidden', position: 'relative', backgroundColor: '#f2efe4'}} width={440}>
+          {filterChannels(channels, searchText).map(ch => (
+            <NavLink key={ch.channel_id} to={{pathname: `${url}/${ch.channel}`}} className="channel-box" activeClassName="selected">
+              <div>
+                <Paragraph
+                  title={ch.topic}
+                  ellipsis={{rows: 3}}
+                  className="title-box">
+                    <Text strong>{highlight(ch.topic, searchText)}</Text>
+                </Paragraph>
+                <div className="avatar-box">
+                {ch.users.slice(0, 2).map(user => (
+                  user.photo_url ? <Avatar key={user.user_id} src={user.photo_url} size={38}/> : <FontAwesomeIcon icon={faUserCircle} style={{width: 38, height: 38}} color="#9e999d"/>
+                ))}
+                </div>
+                <div className="user-list-box">
+                  <Paragraph>
+                    <ul>
+                      {getMatches(ch.users, 4, searchText).map(user => (
+                        <li key={user.user_id}>{highlight(user.name, searchText)}</li>
+                      ))}
+                    </ul>
+                  </Paragraph>
+                </div>
+                <div className="user-num-box">
+                  <Paragraph>{ch.num_all} <FontAwesomeIcon icon={faUser}/> / {ch.num_speakers} <FontAwesomeIcon icon={faCommentDots}/> </Paragraph>
+                </div>
+              </div>
+            </NavLink>
+          ))}
+        </Sider>
+        <Content style={{padding: '8px 8px 8px 8px', overflowY: 'scroll', backgroundColor: '#fefefe'}}>
+          <Switch>
+            <Route path={`${url}/:channel`} component={TopicPage}/>
+            <Route exact path={`${url}`} component={WaitPage}/>
+          </Switch>
+        </Content>
+      </Layout>
+
     </Layout>
   );
 
@@ -175,6 +200,27 @@ function filterChannels(channels, searchText) {
       return searchWords.some(w => context && new RegExp(w,'ig').test(context));
     });
   });
+}
+
+function getMatches(users, num, searchText) {
+  if (!searchText) {
+    return users.slice(0, num);
+  }
+
+  const withMatch = users.map(user => {
+    const searchWords = searchText.split(/\s/);
+    const match = searchWords.some(w => {
+      return 0 + !!(user.name && new RegExp(w,'ig').test(user.name));
+    });
+    return { ...user, match: match };
+  });
+
+  const match = withMatch.filter(user => user.match);
+  if (match.length >= num) {
+    return match.slice(0, num);
+  } else {
+    return [...match, ...withMatch.filter(user => !user.match).slice(0, num - match.length)];
+  }
 }
 
 function highlight(content, searchText) {

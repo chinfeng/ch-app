@@ -1,0 +1,60 @@
+.ch-toolbar .ant-btn:not(.ant-btn-primary) {
+  background-color: #faf9f4;
+}
+
+.selected.channel-box {
+  background-color: #e7e4d5;
+  box-shadow: 3px 3px 3px #cccccc;
+}
+
+.channel-box {
+  margin: 5px;
+  background-color: white;
+  width: 200px;
+  height: 230px;
+  border-radius: 20px;
+  padding: 15px;
+  float: left;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 2px 2px 1px #cccccc;
+}
+
+.channel-box .avatar-box {
+  top: 100px;
+  position: absolute;
+  width: 100px;
+  height: 100px;
+}
+
+.channel-box .ant-avatar {
+  border: 2px solid white;
+}
+
+.channel-box .avatar-box .ant-avatar:nth-child(2) {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+}
+
+.channel-box .user-list-box {
+  top: 100px;
+  left: 60px;
+  position: absolute;
+}
+
+.channel-box .user-list-box ul {
+  list-style: none;
+}
+
+.channel-box .user-num-box {
+  position: absolute;
+  top: 200px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.channel-box .user-num-box .ant-typography {
+  color: #9e999d;
+}

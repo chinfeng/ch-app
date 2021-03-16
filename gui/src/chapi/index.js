@@ -277,3 +277,8 @@ export async function getActionableNotifications() {
   const resp = await fetch(`${API_URL}/get_actionable_notifications`, { headers: getAuthenticationHeaders()});
   return JSON.parse(resp);
 }
+
+export async function getOnlineFriends() {
+  const resp = await fetch(`${API_URL}/get_online_friends`, { headers: getAuthenticationHeaders()});
+  return JSON.parse(resp);
+}

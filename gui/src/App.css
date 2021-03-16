@@ -34,3 +34,7 @@ div#root {
     transform: scale(1);
   }
 }
+
+.ant-btn-primary {
+  background-color: #5576ab;
+}

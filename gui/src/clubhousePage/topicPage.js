@@ -15,6 +15,8 @@ import { joinRtcChannel, leaveRtcChannel, offRtcEvent, onRtcEvent/*, subscribePu
 import RecordTool from "./recordTool";
 
 import topicStyle from './topic.module.css';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faAsterisk, faUserCircle } from "@fortawesome/free-solid-svg-icons";
 
 const { Panel } = Collapse;
 const { Paragraph } = Typography;
@@ -509,7 +511,7 @@ const TopicPage = () => {
             <div key={user.user_id} style={{padding: '3px', width: '120px'}}>
               <div  className={topicStyle['ch-avatar']}
                 style={{
-                  border: '2px solid #bbb',
+                  // border: '2px solid #bbb',
                   paddingTop: '1em',
                 }}>
                 { isModerator &&
@@ -518,8 +520,8 @@ const TopicPage = () => {
                   </div>
                 }
                 <Row align="middle">
-                  <Col flex={1} style={{textAlign: 'center', padding: '5px', cursor: 'pointer'}}>
-                    <Badge count={muted.indexOf(user.user_id) >= 0 ? <AudioMutedOutlined/> : 0}>
+                  <Col flex={1} style={{textAlign: 'center', cursor: 'pointer'}}>
+                    <Badge count={muted.indexOf(user.user_id) >= 0 ? <AudioMutedOutlined/> : 0} offset={[-8, 64]}>
                       <div style={{position: 'relative'}}>
                         <Avatar size={72} className={topicStyle['user-avatar']} style={{
                           backgroundColor: isSpeaking(user.user_id, speakers) ? '#988A72' : 'transparent',
@@ -532,20 +534,31 @@ const TopicPage = () => {
                           left: 'calc(50% - 30px)',
                           top: '6px'
                         }}/>
-                        <Avatar src={user.photo_url} size={56} className={topicStyle['user-avatar']} style={{
-                          position: 'absolute',
-                          left: 'calc(50% - 28px)',
-                          top: '8px'
-                        }} onClick={() => popProfile(user.user_id)}/>
+                        {user.photo_url ? (
+                          <Avatar src={user.photo_url} size={56} className={topicStyle['user-avatar']} style={{
+                            position: 'absolute',
+                            left: 'calc(50% - 28px)',
+                            top: '8px'
+                          }} onClick={() => popProfile(user.user_id)}/>
+                        ) : (
+                          <FontAwesomeIcon icon={faUserCircle} className={topicStyle['user-avatar']} color="#9e999d" style={{
+                            position: 'absolute',
+                            left: 'calc(50% - 28px)',
+                            top: '8px',
+                            width: 56, height: 56
+                          }} onClick={() => popProfile(user.user_id)}/>
+                        )}
                       </div>
                     </Badge>
                   </Col>
                 </Row>
                 <Row align="top">
-                  <Col flex={1} style={{textAlign: 'center', padding: '0.5em'}}>
+                  <Col flex={1} style={{textAlign: 'center'}}>
                     <Paragraph ellipsis={true}>
                       {user.is_moderator ? (
-                        <SettingOutlined title="Moderator" style={{color: '#1890ff'}}/>
+                        <div style={{color: 'white', position: 'relative', backgroundColor: '#52ac7a', borderRadius: '40%', width: 16, height: 16, top: 2, marginRight: 3, display: 'inline-block'}}>
+                          <FontAwesomeIcon style={{position: 'absolute', top: 3, left: 3, width: 10, height: 10}} icon={faAsterisk} title="Moderator"/>
+                        </div>
                       ) : (
                         isModerator &&
                           <Button size="small" type="link" icon={<SettingOutlined title="Moderator" style={{color: '#bec8c8'}}/>} onClick={() => doMakeModerator(user.user_id)}/>
@@ -563,19 +576,23 @@ const TopicPage = () => {
             <div style={{display: 'flex', flexWrap: 'wrap', alignItem: 'flex-start'}}>
               {auUsers.filter(user => !user.is_speaker).map(user => (
                   <div key={user.user_id} style={{padding: '3px', width: '100px'}}>
-                    <div style={{border: '2px solid #bbb', paddingTop: '1em'}} className={topicStyle['ch-avatar']}>
+                    <div style={{paddingTop: '1em'}} className={topicStyle['ch-avatar']}>
                       { isModerator &&
                         <div class="show-on-hover" style={{position: 'absolute', left: 5, top: 5}}>
                           <Button size="small" type="link" icon={<VerticalAlignTopOutlined />} onClick={() => doInviteSpeaker(user.user_id)}/>
                         </div>
                       }
                       <Row align="middle">
-                        <Col flex={1} style={{textAlign: 'center', padding: '5px', cursor: 'pointer'}}>
-                          <Avatar src={user.photo_url} size={48}  onClick={() => popProfile(user.user_id)}/>
+                        <Col flex={1} style={{textAlign: 'center', cursor: 'pointer'}}>
+                          {user.photo_url ? (
+                            <Avatar src={user.photo_url} size={48}  onClick={() => popProfile(user.user_id)}/>
+                          ) : (
+                            <FontAwesomeIcon icon={faUserCircle} style={{width: 48, height: 48}} color="#9e999d" onClick={() => popProfile(user.user_id)}/>
+                          )}
                         </Col>
                       </Row>
                       <Row align="top">
-                        <Col flex={1} style={{textAlign: 'center', padding: '0.5em'}}>
+                        <Col flex={1} style={{textAlign: 'center'}}>
                           <Paragraph ellipsis={true}>{user.name}</Paragraph>
                         </Col>
                       </Row>
