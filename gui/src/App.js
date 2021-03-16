@@ -9,8 +9,9 @@ import {
 } from 'react-router-dom';
 import { ConfigProvider, Result } from 'antd';
 
-import enUS from 'antd/es/locale/en_US'
-import zhCN from 'antd/es/locale/zh_CN'
+import enUS from 'antd/es/locale/en_US';
+import zhCN from 'antd/es/locale/zh_CN';
+import zhTW from 'antd/es/locale/zh_TW';
 
 import './App.css';
 import i18n from './i18n';
@@ -23,7 +24,7 @@ import { checkWaitlistStatus, getActionableNotifications, getFollowingIds, getNo
 import { LoadingOutlined } from '@ant-design/icons';
 
 const locales = {
-  'en': enUS, 'en-US': enUS, 'zh': zhCN, 'zh-CN': zhCN
+  'en': enUS, 'en-US': enUS, 'zh': zhCN, 'zh-CN': zhCN, 'zh-TW': zhTW
 }
 
 function App() {

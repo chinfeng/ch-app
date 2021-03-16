@@ -1,9 +1,14 @@
+import './login.css';
+
 import { Form, Input, Button, Space, message, Select, Row, Col, Alert, notification } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { LoadingOutlined, CheckOutlined, ExclamationCircleOutlined, FileProtectOutlined } from '@ant-design/icons'
 import { useCallback, useContext, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { remote } from 'electron';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCloudversify } from '@fortawesome/free-brands-svg-icons';
+
 import fs from 'fs';
 
 import countryCodes from 'country-codes-list';
@@ -47,8 +52,11 @@ const LoginPage = () => {
   const [form] = Form.useForm();
   const [SubmitButtonIcon, setSubmitButtonIcon] = useState();
   const SubmitButtonIconComp = icons[SubmitButtonIcon];
-  const [vcodeButtonIcon, setVcodeButtonIcon] = useState();
-  const VcodeButtonIconComp = icons[vcodeButtonIcon];
+  const [vcodeLoading, setVcodeLoading] = useState(false);
+  const [vcodeError, setVcodeError] = useState(false);
+
+  const [loginShow, setLoginShow] = useState(false);
+
   const [isCompleted, setCompleted] = useState(false);
   const [isWait, setWait] = useState(false);
   const [isOnboarding, setOnboarding] = useState(false);
@@ -92,6 +100,14 @@ const LoginPage = () => {
 
   return (
     <Space direction="vertical" style={{ height: '100%', width: '100%', paddingTop: '2em' }}>
+      <Row>
+        <Col span={18} style={{textAlign: 'right'}}>
+          <Button type="link" icon={<FileProtectOutlined />} onClick={takeAuthorizedInfo}>
+            {t('importAuthorized')}
+          </Button>
+        </Col>
+      </Row>
+
       <Form form={form}
         {...layout}
         name="basic"
@@ -102,7 +118,6 @@ const LoginPage = () => {
         onFinishFailed={onFinishFailed}
       >
         <Form.Item
-          label={t('mobile')}
           name="mobile"
           rules={[
             {
@@ -111,37 +126,39 @@ const LoginPage = () => {
             },
           ]}
         >
-          <Input addonBefore={countryCodeSelector} disabled={isCompleted} />
+          <Input
+            addonBefore={countryCodeSelector}
+            addonAfter={
+              <Button
+                icon={<FontAwesomeIcon icon={faCloudversify}/>}
+                loading={vcodeLoading}
+                danger={vcodeError}
+                type="link"
+                size="small"
+                onClick={sendVerificationCode}
+                disabled={isCompleted}
+                title={t('sendvcode')}
+              />
+            }
+            disabled={isCompleted}
+            placeholder={t('mobile')} />
         </Form.Item>
 
-        <Form.Item label={t('vcode')}>
-          <Row gutter={8}>
-            <Col span={12}>
-              <Form.Item
-                name="vcode"
-                noStyle
-                rules={[{ required: true }]}
-              >
-                <Input disabled={isCompleted} />
-              </Form.Item>
-            </Col>
-            <Col span={12}>
-              <Button icon={VcodeButtonIconComp && <VcodeButtonIconComp />} onClick={sendVerificationCode} disabled={isCompleted}>
-                {t('sendvcode')}
+        <Form.Item
+          name="vcode"
+          style={{visibility: loginShow ? 'visible' : 'hidden'}}
+          rules={[{ required: true }]}
+        >
+          <Input
+            className="ch-login-input-group"
+            disabled={isCompleted}
+            placeholder={t('vcode')}
+            addonAfter={
+              <Button icon={SubmitButtonIconComp && <SubmitButtonIconComp />}  type="link" size="small" block htmlType="submit" disabled={isCompleted}>
+                {t('login')}
               </Button>
-            </Col>
-          </Row>
-        </Form.Item>
-
-        <Form.Item {...tailLayout}>
-          <Space>
-            <Button icon={SubmitButtonIconComp && <SubmitButtonIconComp />} type="primary" htmlType="submit" disabled={isCompleted}>
-              {t('login')}
-            </Button>
-            <Button icon={<FileProtectOutlined />} onClick={takeAuthorizedInfo}>
-              {t('importAuthorized')}
-            </Button>
-          </Space>
+            }
+          />
         </Form.Item>
       </Form>
 
@@ -188,19 +205,22 @@ const LoginPage = () => {
 
   async function sendVerificationCode() {
     const mobile = (form.getFieldValue('countryCode') + form.getFieldValue('mobile')).replace(/\s/g, '');
-    setVcodeButtonIcon('loading');
+    setVcodeLoading(true);
     try {
       const resp = await startPhoneNumberAuth(mobile);
       console.log('=== startAuth ===', resp);
       console.log(resp);
       if (resp.body.success) {
-        setVcodeButtonIcon('checked');
+        setVcodeError(false);
+        setLoginShow(true);
       } else {
-        setVcodeButtonIcon('error');
+        setVcodeError(true);
       }
     } catch (e) {
       console.error(e);
-      setVcodeButtonIcon('error');
+      setVcodeError(true);
+    } finally {
+      setVcodeLoading(false);
     }
   }
 
