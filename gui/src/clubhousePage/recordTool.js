@@ -4,9 +4,12 @@ import { useTranslation } from 'react-i18next';
 import path from 'path';
 import { shell } from 'electron';
 import { muteLocal, setVoicePitch, startRecord, stopRecord } from '../rtc';
-import { AudioMutedOutlined, AudioOutlined, BorderOutlined, CloudDownloadOutlined, FireFilled, FireOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
+import { AudioMutedOutlined, AudioOutlined, VerticalAlignBottomOutlined } from "@ant-design/icons";
 import { acceptSpeakerInvite, audienceReply, getChannel, uninviteSpeaker } from "../chapi";
 import { userInfoContext } from "../context";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircle, faHandPaper as faHandPaperSolid, faSquare } from "@fortawesome/free-solid-svg-icons";
+import { faHandPaper as faHandPaperRegular } from "@fortawesome/free-regular-svg-icons";
 
 const RecordTool = ({topic, channel, isMeSpeaking, isHandraiseEnabled, onAcceptSpeakerInvite, onMoveToAudience}) => {
   const [recording, setRecording] = useState(false);
@@ -106,13 +109,13 @@ const RecordTool = ({topic, channel, isMeSpeaking, isHandraiseEnabled, onAcceptS
       { isMeSpeaking ? (
         <Button size="small" onClick={moveToAudience} loading={isMovingToAudience} shape="circle"  title="Move to audient" icon={<VerticalAlignBottomOutlined/> }/>
       ) : (
-        <Button size="small" onClick={toggleRaiseHand} loading={isRaising} disabled={!isHandraiseEnabled} shape="circle"  title="Raise Hand" icon={isHandRaised ? <FireFilled/> : <FireOutlined/> }/>
+        <Button size="small" onClick={toggleRaiseHand} loading={isRaising} disabled={!isHandraiseEnabled} shape="circle"  title="Raise Hand" icon={isHandRaised ? <FontAwesomeIcon icon={faHandPaperSolid}/> : <FontAwesomeIcon icon={faHandPaperRegular}/> }/>
       )}
 
       { recording ? (
-        <Button size="small" danger title="Stop Record" shape="circle" onClick={stop} icon={<BorderOutlined/>} style={{animation: 'animateHeart 1.2s infinite'}}/>
+        <Button size="small" danger title="Stop Record" shape="circle" onClick={stop} icon={<FontAwesomeIcon icon={faSquare}/>} style={{animation: 'animateHeart 1.2s infinite'}}/>
       ) : (
-        <Button size="small" danger onClick={start} shape="circle" title="Record" icon={<CloudDownloadOutlined/>}/>
+        <Button size="small" danger onClick={start} shape="circle" title="Record" icon={<FontAwesomeIcon icon={faCircle}/>}/>
       )}
     </Space>
   )

@@ -17,6 +17,7 @@ import RecordTool from "./recordTool";
 import topicStyle from './topic.module.css';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAsterisk, faUserCircle } from "@fortawesome/free-solid-svg-icons";
+import { faHandPeace } from "@fortawesome/free-regular-svg-icons";
 
 const { Panel } = Collapse;
 const { Paragraph } = Typography;
@@ -472,6 +473,7 @@ const TopicPage = () => {
   } else {
     return (
       <PageHeader
+        backIcon={<FontAwesomeIcon icon={faHandPeace} title="Leave Room"/>}
         onBack={() => history.push('.')}
         title={topic}
         style={{position: 'relative'}}
