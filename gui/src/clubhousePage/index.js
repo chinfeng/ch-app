@@ -154,7 +154,7 @@ const ClubHousePage = () => {
                   user.photo_url ? <Avatar key={user.user_id} src={user.photo_url} size={38}/> : <FontAwesomeIcon icon={faUserCircle} style={{width: 38, height: 38}} color="#9e999d"/>
                 ))}
                 </div>
-                <div className="user-list-box">
+                <div className="user-list-box" title={ch.users.length <= 4 ? '' : ch.users.map(u => u.name).join('\n')}>
                   <Paragraph>
                     <ul>
                       {getMatches(ch.users, 4, searchText).map(user => (
