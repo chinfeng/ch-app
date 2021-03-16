@@ -11,13 +11,17 @@
   margin: 5px;
   background-color: white;
   width: 200px;
-  height: 230px;
+  min-height: 200px;
   border-radius: 20px;
   padding: 15px;
   float: left;
   overflow: hidden;
   position: relative;
   box-shadow: 2px 2px 1px #cccccc;
+}
+
+.channel-box .title-box {
+  min-height: 66px;
 }
 
 .channel-box .avatar-box {
@@ -39,8 +43,8 @@
 
 .channel-box .user-list-box {
   top: 100px;
-  left: 60px;
-  position: absolute;
+  padding-left: 40px;
+  min-height: 80px;
 }
 
 .channel-box .user-list-box ul {
@@ -48,8 +52,6 @@
 }
 
 .channel-box .user-num-box {
-  position: absolute;
-  top: 200px;
   left: 0;
   width: 100%;
   text-align: center;
@@ -57,4 +59,5 @@
 
 .channel-box .user-num-box .ant-typography {
   color: #9e999d;
+  margin-bottom: 0;
 }

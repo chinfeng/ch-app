@@ -110,6 +110,8 @@ const ClubHousePage = () => {
     }
   }, [userInfo, t]);
 
+  const filteredChannels = filterChannels(channels, searchText);
+
   return (
     <Layout style={{height: '100%'}}>
       <Header style={{backgroundColor: '#e7e4d5'}}>
@@ -140,35 +142,12 @@ const ClubHousePage = () => {
       </Header>
       <Layout style={{height: 'calc(100% - 64px)'}}>
         <Sider style={{overflowY: 'scroll', overflowX: 'hidden', position: 'relative', backgroundColor: '#f2efe4'}} width={440}>
-          {filterChannels(channels, searchText).map(ch => (
-            <NavLink key={ch.channel_id} to={{pathname: `${url}/${ch.channel}`}} className="channel-box" activeClassName="selected">
-              <div>
-                <Paragraph
-                  title={ch.topic || `(CLUB: ${ch.club_name})`}
-                  ellipsis={{rows: 3}}
-                  className="title-box">
-                    <Text strong>{highlight(ch.topic, searchText)}</Text>
-                </Paragraph>
-                <div className="avatar-box">
-                {ch.users.slice(0, 2).map(user => (
-                  user.photo_url ? <Avatar key={user.user_id} src={user.photo_url} size={38}/> : <FontAwesomeIcon icon={faUserCircle} style={{width: 38, height: 38}} color="#9e999d"/>
-                ))}
-                </div>
-                <div className="user-list-box" title={ch.users.length <= 4 ? '' : ch.users.map(u => u.name).join('\n')}>
-                  <Paragraph>
-                    <ul>
-                      {getMatches(ch.users, 4, searchText).map(user => (
-                        <li key={user.user_id}>{highlight(user.name, searchText)}</li>
-                      ))}
-                    </ul>
-                  </Paragraph>
-                </div>
-                <div className="user-num-box">
-                  <Paragraph>{ch.num_all} <FontAwesomeIcon icon={faUser}/> / {ch.num_speakers} <FontAwesomeIcon icon={faCommentDots}/> </Paragraph>
-                </div>
-              </div>
-            </NavLink>
-          ))}
+          <div style={{float:'left', width: 210}}>
+            {createChannelCol(filteredChannels.filter((_, idx) => idx % 2 === 0))}
+          </div>
+          <div style={{float:'left', width: 210, top: 0}}>
+            {createChannelCol(filteredChannels.filter((_, idx) => idx % 2 === 1))}
+          </div>
         </Sider>
         <Content style={{padding: '8px 8px 8px 8px', overflowY: 'scroll', backgroundColor: '#fefefe'}}>
           <Switch>
@@ -186,6 +165,38 @@ const ClubHousePage = () => {
     history.push('/login');
   }
 
+  function createChannelCol (chs) {
+    return chs.map(ch => (
+      <NavLink key={ch.channel_id} to={{pathname: `${url}/${ch.channel}`}} className="channel-box" activeClassName="selected">
+        <div>
+          <Paragraph
+            title={ch.topic}
+            ellipsis={{rows: 3}}
+            className="title-box">
+              <Text strong>{(ch.topic && highlight(ch.topic, searchText)) || (ch.club_name && `(CLUB: ${ch.club_name})`) || `(ID: ${ch.channel_id})`}</Text>
+          </Paragraph>
+          <div className="avatar-box">
+          {ch.users.slice(0, 2).map(user => (
+            user.photo_url ? <Avatar key={user.user_id} src={user.photo_url} size={38}/> : <FontAwesomeIcon icon={faUserCircle} style={{width: 38, height: 38}} color="#9e999d"/>
+          ))}
+          </div>
+          <div className="user-list-box">
+            <Paragraph>
+              <ul>
+                {ch.users.map(user => (
+                  <li key={user.user_id}><Text ellipsis={{tooltip: true}}>{highlight(user.name, searchText)}</Text></li>
+                ))}
+              </ul>
+            </Paragraph>
+          </div>
+          <div className="user-num-box">
+            <Paragraph>{ch.num_all} <FontAwesomeIcon icon={faUser}/> / {ch.num_speakers} <FontAwesomeIcon icon={faCommentDots}/> </Paragraph>
+          </div>
+        </div>
+      </NavLink>
+    ));
+  }
+
 }
 
 function filterChannels(channels, searchText) {
@@ -200,27 +211,6 @@ function filterChannels(channels, searchText) {
       return searchWords.some(w => context && new RegExp(w,'ig').test(context));
     });
   });
-}
-
-function getMatches(users, num, searchText) {
-  if (!searchText) {
-    return users.slice(0, num);
-  }
-
-  const withMatch = users.map(user => {
-    const searchWords = searchText.split(/\s/);
-    const match = searchWords.some(w => {
-      return 0 + !!(user.name && new RegExp(w,'ig').test(user.name));
-    });
-    return { ...user, match: match };
-  });
-
-  const match = withMatch.filter(user => user.match);
-  if (match.length >= num) {
-    return match.slice(0, num);
-  } else {
-    return [...match, ...withMatch.filter(user => !user.match).slice(0, num - match.length)];
-  }
 }
 
 function highlight(content, searchText) {
