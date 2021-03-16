@@ -188,7 +188,7 @@ const TopicPage = () => {
         console.log(`=== joinChannel ===` , {channel}, resp);
         if (resp.body.success) {
           setUsers(resp.body.users);
-          setTopic(resp.body.topic);
+          setTopic(resp.body.topic || `(CLUB: ${resp.body.club_name})`);
           setToken(resp.body.token);
           setHandraiseEnabled(resp.body.is_handraise_enabled);
 

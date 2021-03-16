@@ -144,7 +144,7 @@ const ClubHousePage = () => {
             <NavLink key={ch.channel_id} to={{pathname: `${url}/${ch.channel}`}} className="channel-box" activeClassName="selected">
               <div>
                 <Paragraph
-                  title={ch.topic}
+                  title={ch.topic || `(CLUB: ${ch.club_name})`}
                   ellipsis={{rows: 3}}
                   className="title-box">
                     <Text strong>{highlight(ch.topic, searchText)}</Text>
