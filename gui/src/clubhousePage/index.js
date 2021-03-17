@@ -177,7 +177,7 @@ const ClubHousePage = () => {
           </Paragraph>
           <div className="avatar-box">
           {ch.users.slice(0, 2).map(user => (
-            user.photo_url ? <Avatar key={user.user_id} src={user.photo_url} size={38}/> : <FontAwesomeIcon icon={faUserCircle} style={{width: 38, height: 38}} color="#9e999d"/>
+            user.photo_url ? <Avatar key={user.user_id} src={user.photo_url} size={38}/> : <Avatar key={user.user_id} size={38} icon={<FontAwesomeIcon icon={faUserCircle} style={{width: 38, height: 38}} color="#9e999d"/>}/>
           ))}
           </div>
           <div className="user-list-box">

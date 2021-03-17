@@ -31,10 +31,6 @@
   height: 100px;
 }
 
-.channel-box .ant-avatar {
-  border: 2px solid white;
-}
-
 .channel-box .avatar-box .ant-avatar:nth-child(2) {
   position: absolute;
   left: 20px;

@@ -61,6 +61,10 @@ function App() {
     }
 
     async function fetchNotification () {
+      if (!init) {
+        return;
+      }
+
       try {
         const notiResp = await getNotifications();
         console.log('=== getNotifications ===', notiResp);
@@ -71,6 +75,10 @@ function App() {
     }
 
     async function fetchActionableNotification () {
+      if (!init) {
+        return;
+      }
+
       try {
         const notiActResp = await getActionableNotifications();
         console.log('=== getActionableNotifications ===', notiActResp);
