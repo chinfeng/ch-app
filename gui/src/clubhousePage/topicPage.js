@@ -161,14 +161,14 @@ const TopicPage = () => {
   const setUsers = useCallback(users => {
     const newSpUsers = users.filter(user => user.is_speaker);
     setSpUsers(oldSpUsers => {
-      const part1 = _.intersectionBy(oldSpUsers, newSpUsers, d => d.user_id);
+      const part1 = _.intersectionBy(newSpUsers, oldSpUsers, d => d.user_id);
       const part2 = _.differenceBy(newSpUsers, oldSpUsers, d => d.user_id);
       return [...part1, ...part2];
     });
 
     const newAuUsers = users.filter(user => !user.is_speaker);
     setAuUsers(oldAuUsers => {
-      const part1 = _.intersectionBy(oldAuUsers, newAuUsers, d => d.user_id);
+      const part1 = _.intersectionBy(newAuUsers, oldAuUsers, d => d.user_id);
       const part2 = _.differenceBy(newAuUsers, oldAuUsers, d => d.user_id);
       return [...part1, ...part2];
     });
@@ -517,7 +517,7 @@ const TopicPage = () => {
                   paddingTop: '1em',
                 }}>
                 { isModerator &&
-                  <div class="show-on-hover" style={{position: 'absolute', left: 10, top: 10}}>
+                  <div className="show-on-hover" style={{position: 'absolute', left: 10, top: 10}}>
                     <Button size="small" type="link" icon={<VerticalAlignBottomOutlined />} onClick={() => doUninviteSpeaker(user.user_id)}/>
                   </div>
                 }
@@ -580,7 +580,7 @@ const TopicPage = () => {
                   <div key={user.user_id} style={{padding: '3px', width: '100px'}}>
                     <div style={{paddingTop: '1em'}} className={topicStyle['ch-avatar']}>
                       { isModerator &&
-                        <div class="show-on-hover" style={{position: 'absolute', left: 5, top: 5}}>
+                        <div className="show-on-hover" style={{position: 'absolute', left: 5, top: 5}}>
                           <Button size="small" type="link" icon={<VerticalAlignTopOutlined />} onClick={() => doInviteSpeaker(user.user_id)}/>
                         </div>
                       }

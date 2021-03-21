@@ -398,10 +398,10 @@ abbrev@1:
   resolved "https://registry.npm.taobao.org/abbrev/download/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
   integrity sha1-+PLIh60Qv2f2NPAFtph/7TF5qsg=
 
-agora-electron-sdk@^3.2.1-rc.71-build.1123:
-  version "3.2.1-rc.71-build.1123"
-  resolved "https://registry.npm.taobao.org/agora-electron-sdk/download/agora-electron-sdk-3.2.1-rc.71-build.1123.tgz#7494b5d47fccbae71abc09ab441789c6c299b68c"
-  integrity sha1-dJS11H/MuucavAmrRBeJxsKZtow=
+agora-electron-sdk@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/agora-electron-sdk/-/agora-electron-sdk-3.3.1.tgz#38b405dc5b5f3f7fa405dd24024529a10c965bcc"
+  integrity sha512-KFqgKaQ6olhqo7qKvx0zq5VbMjnMS//8rA3vH3fTZ9UiopF1razXOcpioqzKsLTs/6tT7ynVIpOFxuMhKoGSzg==
   dependencies:
     bluebird "^3.7.1"
     download "^7.1.0"

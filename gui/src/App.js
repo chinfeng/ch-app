@@ -61,7 +61,7 @@ function App() {
     }
 
     async function fetchNotification () {
-      if (!init) {
+      if (init) {
         return;
       }
 
@@ -75,7 +75,7 @@ function App() {
     }
 
     async function fetchActionableNotification () {
-      if (!init) {
+      if (init) {
         return;
       }
 
