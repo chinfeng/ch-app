@@ -20,12 +20,18 @@
   box-shadow: 2px 2px 1px #cccccc;
 }
 
+.channel-box .user-list-wrapper {
+  position: relative;
+  margin-top: 0.5em;
+}
+
 .channel-box .title-box {
-  min-height: 66px;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
 }
 
 .channel-box .avatar-box {
-  top: 100px;
+  top: 10px;
   position: absolute;
   width: 100px;
   height: 100px;

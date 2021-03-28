@@ -169,28 +169,27 @@ const ClubHousePage = () => {
     return chs.map(ch => (
       <NavLink key={ch.channel_id} to={{pathname: `${url}/${ch.channel}`}} className="channel-box" activeClassName="selected">
         <div>
-          <Paragraph
-            title={ch.topic}
-            ellipsis={{rows: 3}}
-            className="title-box">
-              <Text strong>{(ch.topic && highlight(ch.topic, searchText)) || (ch.club_name && `(CLUB: ${ch.club_name})`) || `(ID: ${ch.channel_id})`}</Text>
+          <Paragraph className="title-box">
+            <Text strong>{(ch.topic && highlight(ch.topic, searchText)) || (ch.club_name && `(CLUB: ${ch.club_name})`) || `(ID: ${ch.channel_id})`}</Text>
           </Paragraph>
-          <div className="avatar-box">
-          {ch.users.slice(0, 2).map(user => (
-            user.photo_url ? <Avatar key={user.user_id} src={user.photo_url} size={38}/> : <Avatar key={user.user_id} size={38} icon={<FontAwesomeIcon icon={faUserCircle} style={{width: 38, height: 38}} color="#9e999d"/>}/>
-          ))}
-          </div>
-          <div className="user-list-box">
-            <Paragraph>
-              <ul>
-                {ch.users.map(user => (
-                  <li key={user.user_id}><Text ellipsis={{tooltip: true}}>{highlight(user.name, searchText)}</Text></li>
-                ))}
-              </ul>
-            </Paragraph>
-          </div>
-          <div className="user-num-box">
-            <Paragraph>{ch.num_all} <FontAwesomeIcon icon={faUser}/> / {ch.num_speakers} <FontAwesomeIcon icon={faCommentDots}/> </Paragraph>
+          <div className="user-list-wrapper">
+            <div className="avatar-box">
+              {ch.users.slice(0, 2).map(user => (
+                user.photo_url ? <Avatar key={user.user_id} src={user.photo_url} size={38}/> : <Avatar key={user.user_id} size={38} icon={<FontAwesomeIcon icon={faUserCircle} style={{width: 38, height: 38}} color="#9e999d"/>}/>
+              ))}
+            </div>
+            <div className="user-list-box">
+              <Paragraph>
+                <ul>
+                  {ch.users.map(user => (
+                    <li key={user.user_id}><Text ellipsis={{tooltip: true}}>{highlight(user.name, searchText)}</Text></li>
+                  ))}
+                </ul>
+              </Paragraph>
+            </div>
+            <div className="user-num-box">
+              <Paragraph>{ch.num_all} <FontAwesomeIcon icon={faUser}/> / {ch.num_speakers} <FontAwesomeIcon icon={faCommentDots}/> </Paragraph>
+            </div>
           </div>
         </div>
       </NavLink>
